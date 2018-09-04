@@ -63,13 +63,5 @@ namespace UnitTests
             Assert.IsFalse(_memCache.TryGetValue("secondKey", out var secondKey));
             Assert.AreEqual("newFirstKeyValue", firstValue);
         }
-
-        //[Test]
-        //public void TryGetValue_InvalidOutValueDefined_ShouldReturnFalseAndDefaultValue()
-        //{
-        //    _memCache.AddOrUpdate("firstKey", 1);
-
-        //    var result = _memCache.TryGetValue("firstKey", out string value);
-        //}
     }
 }
