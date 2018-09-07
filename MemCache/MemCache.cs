@@ -46,6 +46,7 @@ namespace MemCache
         /// <param name="value"></param>
         public void AddOrUpdate(TKey key, TValue value)
         {
+            //Get exclusive lock
             _readerWriterLocker.EnterWriteLock();
             try
             {
@@ -55,7 +56,7 @@ namespace MemCache
                     {
                         //remove oldest record if the capacity has been reached
                         var oldest = _historyOfInserts.First();
-                        _dictionaryCache.Remove(oldest); //remove the oldest index value
+                        _dictionaryCache.Remove(oldest);
                         _historyOfInserts.Remove(oldest);
                     }
                     _dictionaryCache.Add(key, value);
@@ -90,6 +91,7 @@ namespace MemCache
             var valueFoundInCache = false;
             value = default(TValue);
 
+            //create shared lock for reading threads
             _readerWriterLocker.EnterReadLock();
             try
             {
