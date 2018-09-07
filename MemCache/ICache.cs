@@ -1,5 +1,11 @@
 ﻿namespace MemCache
 {
+    /// <summary>
+    /// Interface for implmenting different implementations of a cache. For now only
+    /// Mem change uses this interface.
+    /// </summary>
+    /// <typeparam name="TKey">The type of the key.</typeparam>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
     public interface ICache<in TKey, TValue>
     {
         /// <summary>

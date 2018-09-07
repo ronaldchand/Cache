@@ -3,9 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2018
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemCache", "MemCache\MemCache.csproj", "{7B661856-DFCB-4E42-BAC7-B20184F78953}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MemCache", "MemCache\MemCache.csproj", "{7B661856-DFCB-4E42-BAC7-B20184F78953}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{BD0B7F7A-5AE3-4AFB-99E4-586340825395}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{BD0B7F7A-5AE3-4AFB-99E4-586340825395}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A92A80EC-8976-49B2-8EC9-364DC74B8789}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Collections.Specialized;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace MemCache
@@ -7,6 +8,9 @@ namespace MemCache
     /// <summary>
     /// Mem cache that implements a set number of records that can be held in memory. Once that
     /// limit is exceeded the oldest data cached will be removed to make space for the new one.
+    /// The cache assumes less write in comparison to read whereby the write operation (AddOrUpdate) will block threads but
+    /// reads will allow all threads to access the cache. However if the writelock is entered then reads will be queued until write 
+    /// is completed. 
     /// </summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TValue">The type of the value.</typeparam>
@@ -15,7 +19,12 @@ namespace MemCache
     {
         private readonly int _maxNumberOfRecordsToStore;
 
-        private readonly OrderedDictionary _orderedDictionaryCache = new OrderedDictionary();
+        private readonly Dictionary<TKey,TValue> _dictionaryCache = new Dictionary<TKey,TValue>();
+
+        //another internal list to track the history of the data being inserted into cache. Since list keeps order of insertion
+        //its better to use this for tracking the history
+        private readonly List<TKey> _historyOfInserts = new List<TKey>();
+
         private readonly ReaderWriterLockSlim _readerWriterLocker = new ReaderWriterLockSlim();
 
         /// <summary>
@@ -40,21 +49,27 @@ namespace MemCache
             _readerWriterLocker.EnterWriteLock();
             try
             {
-                if (!_orderedDictionaryCache.Contains(key))
+                if (!_dictionaryCache.ContainsKey(key))
                 {
-                    if (_orderedDictionaryCache.Count >= _maxNumberOfRecordsToStore)
+                    if (_dictionaryCache.Count >= _maxNumberOfRecordsToStore)
                     {
                         //remove oldest record if the capacity has been reached
-                        _orderedDictionaryCache.RemoveAt(0); 
+                        var oldest = _historyOfInserts.First();
+                        _dictionaryCache.Remove(oldest); //remove the oldest index value
+                        _historyOfInserts.Remove(oldest);
                     }
-                    _orderedDictionaryCache.Add(key, value);
+                    _dictionaryCache.Add(key, value);
+                    _historyOfInserts.Add(key);
                 }
                 else
                 {
                     //removes the entry and adds it to the bottom of the list to ensure that 
                     //any data that gets updated relocated in the dictionary.
-                    _orderedDictionaryCache.Remove(key);
-                    _orderedDictionaryCache.Add(key, value);
+                    _dictionaryCache.Remove(key);
+                    _historyOfInserts.Remove(key);
+
+                    _historyOfInserts.Add(key);
+                    _dictionaryCache.Add(key, value);
                 }
             }
             finally
@@ -78,9 +93,9 @@ namespace MemCache
             _readerWriterLocker.EnterReadLock();
             try
             {
-                if (_orderedDictionaryCache.Contains(key))
+                if (_dictionaryCache.ContainsKey(key))
                 {
-                    value = (TValue) _orderedDictionaryCache[key];
+                    value = _dictionaryCache[key];
                     valueFoundInCache = true;
                 }
             }
