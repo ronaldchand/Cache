@@ -65,12 +65,11 @@ namespace MemCache
                 else
                 {
                     //removes the entry and adds it to the bottom of the list to ensure that 
-                    //any data that gets updated relocated in the dictionary.
-                    _dictionaryCache.Remove(key);
-                    _historyOfInserts.Remove(key);
+                    //any data that gets updated relocated in the history list.
+                    _dictionaryCache[key] = value;
 
+                    _historyOfInserts.Remove(key);
                     _historyOfInserts.Add(key);
-                    _dictionaryCache.Add(key, value);
                 }
             }
             finally
